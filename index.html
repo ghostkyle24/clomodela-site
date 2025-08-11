@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Clomodela — Acesso (clone)</title>
+
+  <!-- Fonts / Icons (como no original) -->
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <style>
+    :root{
+      --green: #00ff99;
+      --dark: #101820;
+      --darker: #1a2a2f;
+      --card: rgba(20,40,30,0.98);
+      --card-alt: rgba(0,32,16,0.85);
+      --border: #00ff99;
+      --shadow: 0 8px 32px 0 rgba(0,255,128,0.12), 0 1.5px 8px 0 #0f0a;
+      --text: #e0ffe0;
+      --muted: #baffc9;
+      --accent-dark: #162a22;
+      --radius: 16px;
+    }
+
+    /* Reset */
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:"Montserrat",Arial,sans-serif;background:linear-gradient(135deg,var(--dark) 0%,var(--darker) 100%);color:var(--text);-webkit-font-smoothing:antialiased}
+    a{color:inherit;text-decoration:none}
+
+    /* Canvas background (particles) */
+    #c { position: fixed; top:0; left:0; width:100vw; height:100vh; z-index:0; pointer-events:none; }
+
+    /* Gradient overlay */
+    #gradient-bg {
+      position: fixed; inset:0; z-index:1; pointer-events:none;
+      background: radial-gradient(circle at 50% 50%, rgba(0,255,153,0.10) 0%, rgba(16,24,32,0.92) 80%);
+      transition: background .2s;
+    }
+
+    /* Content wrapper above canvas */
+    .wrap { position:relative; z-index:2; }
+
+    /* Header */
+    header{
+      width:100%;
+      background:var(--card);
+      box-shadow: 0 2px 12px rgba(0,255,153,0.12);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:10px 32px;
+      position:sticky;
+      top:0;
+      gap:16px;
+    }
+    .logo-header{display:flex;align-items:center;gap:12px}
+    .logo-mark{
+      width:56px;height:56px;border-radius:10px;
+      display:flex;align-items:center;justify-content:center;
+      background: linear-gradient(180deg,#001f0f 0%, #004423 100%);
+      color:var(--green); font-weight:800; font-size:20px;
+      box-shadow: 0 0 18px rgba(0,255,153,0.12);
+    }
+    .logo-title{font-size:28px;color:var(--green);font-weight:700;letter-spacing:1px;text-shadow:0 2px 12px rgba(0,255,153,0.12)}
+
+    nav{display:flex;gap:22px;align-items:center;overflow-x:auto;white-space:nowrap;padding-right:8px}
+    nav a{color:var(--green);font-weight:600;font-size:1rem;display:flex;align-items:center;gap:6px}
+    nav a:hover{color:#ffffff}
+
+    /* Hero */
+    .hero{
+      min-height:60vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:48px 6vw;
+      gap:20px;
+      flex-direction:column;
+    }
+    .hero .title{font-size:2.7rem;font-weight:800;color:var(--green);text-shadow:0 0 16px rgba(0,255,153,0.12);margin:0}
+    .hero .desc{font-size:1.15rem;color:var(--muted);margin:6px 0 18px 0;max-width:920px}
+    .btn-acesso{
+      background: linear-gradient(90deg,var(--green) 0%, #00b36b 100%);
+      color: var(--dark);
+      font-weight:700;
+      font-size:1.05rem;
+      border:none;
+      border-radius:10px;
+      padding:14px 34px;
+      cursor:pointer;
+      box-shadow:0 2px 12px rgba(0,255,153,0.14);
+    }
+    .btn-acesso:hover{transform:scale(1.03)}
+
+    /* Features grid */
+    .features-section{
+      max-width:1100px;margin:28px auto 36px auto;display:flex;flex-wrap:wrap;gap:28px;justify-content:center;padding:0 16px;
+      position:relative; z-index:2;
+    }
+    .feature-card{
+      background:var(--card);
+      border-radius:16px 48px 16px 48px;
+      box-shadow:var(--shadow);
+      padding:28px;
+      min-width:260px; max-width:320px; flex:1 1 260px;
+      display:flex;flex-direction:column;align-items:center;gap:12px;
+      border:2px solid transparent; transition:all .18s ease;
+    }
+    .feature-card:nth-child(even){ background:var(--card-alt); border-radius:48px 16px 48px 16px; border:2px solid var(--green) }
+    .feature-card:hover{ border-color:var(--green); box-shadow:0 0 28px rgba(0,255,153,0.12); transform:translateY(-4px) }
+    .feature-icon{ font-size:2.6rem; color:var(--green); margin-bottom:6px }
+    .feature-title{ color:var(--green); font-weight:700; font-size:1.05rem; text-align:center}
+    .feature-desc{ color:var(--text); text-align:center; font-size:1rem }
+
+    /* Content sections */
+    section{ max-width:900px; margin:28px auto; background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:26px; animation:fadeInUp .9s both; }
+    section:nth-of-type(even){ background:var(--card-alt); border:2px solid var(--green) }
+    section h2{ color:var(--green); margin:0 0 10px 0 }
+    section p, section ul{ color:var(--text); margin:0 0 8px 0 }
+
+    /* Modes */
+    .modes{ display:flex; gap:14px; flex-wrap:wrap; margin-top:8px }
+    .mode{ background:var(--accent-dark); border-radius:8px; padding:12px 16px; color:var(--green); font-weight:700; flex:1 1 220px; text-align:center; box-shadow:0 1px 6px rgba(0,255,153,0.06) }
+
+    /* Form / small card */
+    .form-section{ max-width:420px; margin:18px auto; background:var(--card); border-radius:14px; box-shadow:var(--shadow); padding:22px }
+    .form-title{ color:var(--green); text-align:center; margin-bottom:10px; font-weight:700 }
+    label{ display:block; margin-bottom:6px; color:var(--muted) }
+    input[type="email"], input[type="password"]{ width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--green); background:var(--dark); color:var(--text); outline:none }
+    input:focus{ border-width:1.5px; background:#162a22 }
+    .btn{ width:100%; padding:12px 0; background:linear-gradient(90deg,var(--green) 0%, #00b36b 100%); color:var(--dark); font-weight:700; border:none; border-radius:8px; cursor:pointer }
+
+    /* Footer */
+    footer{ background:#0e1814; color:var(--muted); padding:28px 12px; margin-top:28px; border-top:2px solid var(--green) }
+    .footer-links{ display:flex; flex-wrap:wrap; gap:20px; justify-content:center; margin-bottom:12px }
+    .footer-links a{ color:var(--green); font-weight:700; text-decoration:underline }
+
+    /* Utilities */
+    .small-text{ color:var(--muted); font-size:0.98rem }
+    .pill{ background:rgba(255,255,255,0.02); color:var(--muted); padding:6px 10px; border-radius:999px; font-size:13px; display:inline-block }
+
+    /* Animations & responsiveness */
+    @keyframes fadeInUp { from{opacity:0; transform:translateY(24px)} to{opacity:1; transform:none} }
+    @media (max-width:1000px){ .features-section{ flex-direction:column; align-items:center } header{ padding:10px 18px; flex-direction:column; gap:8px } .logo-title{ font-size:22px } }
+    @media (max-width:520px){ .hero .title{ font-size:1.9rem } .hero .desc{ font-size:1rem } nav{ gap:10px } }
+  </style>
+</head>
+<body>
+  <!-- Canvas & gradient overlay -->
+  <canvas id="c"></canvas>
+  <div id="gradient-bg"></div>
+
+  <div class="wrap">
+    <!-- Header -->
+    <header>
+      <div class="logo-header">
+        <div class="logo-mark" aria-hidden="true">
+          <img src="images/Clomodela_logo.png" alt="Clomodela Logo" width="34" height="34" style="filter:drop-shadow(0 0 8px rgba(0,255,153,0.08))">
+        </div>
+        <div class="logo-title">CLOMODELA</div>
+      </div>
+
+      <nav aria-label="main navigation">
+        <a href="#features">Recursos</a>
+        <a href="#como">Como Usar</a>
+        <a href="#modos">Modos</a>
+        <a href="#preco">Preços</a>
+        <a href="#suporte">Suporte</a>
+        <a href="https://go.perfectpay.com.br/PPU38CPU6KA" target="_blank" id="downloadNav"><span>Download</span>
+          <span class="material-icons" style="font-size:18px;margin-left:6px">download</span>
+        </a>
+      </nav>
+    </header>
+
+    <!-- Hero -->
+    <main>
+      <section class="hero" aria-labelledby="hero-title">
+        <div aria-hidden="true" style="width:120px;height:120px;display:flex;align-items:center;justify-content:center;border-radius:20px;background:linear-gradient(180deg,#001f0f,#00331a);box-shadow:0 0 18px rgba(0,255,153,0.08);margin-bottom:6px">
+          <img src="images/Clomodela_logo.png" alt="Clomodela Logo" width="80" height="80">
+        </div>
+
+        <h1 id="hero-title" class="title">A melhor ferramenta spy da biblioteca de anúncios</h1>
+        <p class="desc">Filtre, analise e descubra criativos vencedores na Biblioteca de Anúncios do Facebook de forma rápida, visual e inteligente.</p>
+
+        <a href="https://go.perfectpay.com.br/PPU38CPU6KA" target="_blank"><button class="btn-acesso"><span class="material-icons" style="vertical-align:middle; margin-right:6px;">download</span> Baixar extensão Chrome</button></a>
+
+        <p class="small-text" style="margin-top:10px; color:#7fff7f; font-size:0.98rem; max-width:720px;">
+          1. Realize o pagamento · 2. Baixe o arquivo · 3. Abra na biblioteca do facebook <code style="background:rgba(255,255,255,0.02); padding:4px 6px; border-radius:6px;">Facebook Ads Library</code> · 4. Abra o Clomodela· 5. Encontre uma oferta escalada!
+        </p>
+      </section>
+
+      <!-- Features -->
+      <div id="features" class="features-section" aria-label="Recursos">
+        <div class="feature-card">
+          <span class="material-icons feature-icon" aria-hidden="true">filter_alt</span>
+          <div class="feature-title">Filtros Avançados</div>
+          <div class="feature-desc">Filtre anúncios por quantidade ativa, tempo, anunciante e muito mais.</div>
+        </div>
+
+        <div class="feature-card">
+          <span class="material-icons feature-icon" aria-hidden="true">search</span>
+          <div class="feature-title">Pesquisa Inteligente</div>
+          <div class="feature-desc">Encontre criativos vencedores rapidamente com busca otimizada.</div>
+        </div>
+
+        <div class="feature-card">
+          <span class="material-icons feature-icon" aria-hidden="true">star</span>
+          <div class="feature-title">Favoritos & Organização</div>
+          <div class="feature-desc">Salve, organize e acesse seus criativos favoritos em um clique.</div>
+        </div>
+
+        <div class="feature-card">
+          <span class="material-icons feature-icon" aria-hidden="true">download</span>
+          <div class="feature-title">Download de Vídeos</div>
+          <div class="feature-desc">Baixe vídeos dos anúncios para análise e inspiração.</div>
+        </div>
+
+        <div class="feature-card">
+          <span class="material-icons feature-icon" aria-hidden="true">insights</span>
+          <div class="feature-title">Análise de Concorrentes</div>
+          <div class="feature-desc">Veja o que os melhores estão fazendo e fique sempre à frente.</div>
+        </div>
+
+        <div class="feature-card">
+          <span class="material-icons feature-icon" aria-hidden="true">bolt</span>
+          <div class="feature-title">Interface Rápida</div>
+          <div class="feature-desc">Tecnologia otimizada para máxima velocidade e experiência.</div>
+        </div>
+      </div>
+
+      <!-- How to / Modes / Price / Support sections -->
+      <section id="como">
+        <h2>Como Utilizar?</h2>
+        <ul>
+          <li>1. Instale a extensão Clomodela no seu navegador Chrome.</li>
+          <li>2. Acesse a Biblioteca de Anúncios do Facebook.</li>
+          <li>3. Use os filtros e modos para encontrar os melhores criativos.</li>
+          <li>4. Salve favoritos, baixe vídeos e organize suas pesquisas.</li>
+        </ul>
+      </section>
+
+      <section id="modos">
+        <h2>Modos de Filtragem</h2>
+        <div class="modes">
+          <div class="mode"><b>Modo Criativo</b><br>Filtra criativos individuais com número de anúncios ativos igual ou acima do filtro.</div>
+          <div class="mode"><b>Modo Somatória</b><br>Soma todos os criativos de um anunciante e filtra pela soma total de anúncios ativos.</div>
+        </div>
+      </section>
+
+      <section id="preco">
+        <h2>Preços:</h2>
+        <div style="font-size:1.5rem;color:var(--green);font-weight:700">Pagamento único de R$47,90. Sem mensalidades ou outras cobranças!</div>
+        <p>Tenha acesso ao código fonte para poder revender caso queira!</p>
+        <p>Pagamento seguro com garantia de 7 dias.</p>
+      </section>
+
+      <section id="suporte">
+        <h2>Suporte & Informações</h2>
+        <div style="display:flex;flex-direction:column;gap:8px;color:var(--muted)">
+          <div><b>Horário:</b> 12:00 até 00:00</div>
+          <div><b>WhatsApp:</b> <a href="https://wa.me/5531971391218?text=Ol%C3%A1%2C%20vim%20do%20site" target="_blank">Clique aqui para falar no WhatsApp</a></div>
+          <div><b>Grupo:</b> <a href="https://chat.whatsapp.com/K1obAOaQbduJMpFRPc8urK" target="_blank">Nosso grupo de WhatsApp</a></div>
+          <div><b>E-mail:</b> <a href="mailto:suporte@asherdigital.com.br">suporte@asherdigital.com.br</a></div>
+        </div>
+        <div style="margin-top:10px;color:var(--muted)"><b>CNPJ:</b> 46.465.706/0001-20 · ASHER NEGÓCIOS DIGITAIS LTDA</div>
+      </section>
+
+      <!-- Optional small form section (keeps parity with original) -->
+      <div class="form-section" aria-labelledby="form-title">
+        <div id="form-title" class="form-title">Acesse sua conta</div>
+        <form id="loginForm" onsubmit="event.preventDefault(); alert('Mock login');">
+          <div style="margin-bottom:12px">
+            <label for="email">E-mail</label>
+            <input id="email" type="email" required placeholder="voce@exemplo.com">
+          </div>
+          <div style="margin-bottom:14px">
+            <label for="senha">Senha</label>
+            <input id="senha" type="password" required placeholder="••••••••">
+          </div>
+          <button class="btn" type="submit">Entrar</button>
+        </form>
+      </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-links">
+        <a href="#features">Recursos</a>
+        <a href="#como">Como Usar</a>
+        <a href="#modos">Modos</a>
+        <a href="#preco">Preços</a>
+        <a href="#suporte">Suporte</a>
+      </div>
+      <div style="text-align:center;color:var(--muted);font-size:0.98rem">
+        © 2025 Clomodela. Todos os direitos reservados.<br>
+        Desenvolvido por ASHER NEGÓCIOS DIGITAIS LTDA - CNPJ: 46.465.706/0001-20
+      </div>
+    </footer>
+  </div>
+
+  <!-- Optional Google One Tap placeholder (kept unobtrusive) -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <!-- Particle Canvas script (adaptado do seu original) -->
+  <script>
+    // Canvas particles (lightweight adaptation)
+    (function(){
+      const c = document.getElementById('c');
+      const ctx = c.getContext('2d');
+      let w = c.width = window.innerWidth;
+      let h = c.height = window.innerHeight;
+      const particles = [];
+      const NUM = Math.max(35, Math.floor((w*h)/60000)); // scale by viewport
+
+      function rand(min, max){ return Math.random()*(max-min)+min }
+
+      function Particle(x,y){
+        this.x = x !== undefined ? x : rand(0,w);
+        this.y = y !== undefined ? y : rand(0,h);
+        this.vx = rand(-1.6,1.6);
+        this.vy = rand(-1.6,1.6);
+        this.size = rand(6,22);
+        this.color = ['rgba(46,204,113,1)','rgba(46,204,113,0.45)','rgba(46,204,113,0.18)'][Math.floor(rand(0,3))];
+        this.life = rand(20,120);
+        this.reset = function(mx,my){
+          this.x = mx || rand(0,w);
+          this.y = my || rand(0,h);
+          this.vx = rand(-1.6,1.6);
+          this.vy = rand(-1.6,1.6);
+          this.size = rand(6,22);
+          this.life = rand(20,120);
+        };
+        this.update = function(){
+          this.x += this.vx;
+          this.y += this.vy;
+          this.life *= 0.96;
+          this.size *= 0.985;
+          if(this.life < 1 || this.size < 0.6 || this.x < -40 || this.x > w+40 || this.y < -40 || this.y > h+40){
+            this.reset();
+          }
+        };
+        this.draw = function(){
+          ctx.fillStyle = this.color;
+          ctx.fillRect(this.x, this.y, this.size, this.size);
+        };
+      }
+
+      for(let i=0;i<NUM;i++) particles.push(new Particle());
+
+      let mouse = {x: w/2, y: h/2};
+      window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+
+      window.addEventListener('mouseover', () => {
+        // burst
+        for(let i=0;i<25;i++){
+          const p = new Particle(mouse.x + rand(-8,8), mouse.y + rand(-8,8));
+          p.vx = rand(-6,6);
+          p.vy = rand(-6,6);
+          p.life = rand(20,80);
+          particles.push(p);
+        }
+      });
+
+      function animate(){
+        ctx.clearRect(0,0,w,h);
+        ctx.fillStyle = "#121212";
+        ctx.fillRect(0,0,w,h);
+        for(let i=0;i<particles.length;i++){
+          const p = particles[i];
+          p.update();
+          p.draw();
+        }
+        requestAnimationFrame(animate);
+      }
+      animate();
+
+      window.addEventListener('resize', function(){
+        w = c.width = window.innerWidth;
+        h = c.height = window.innerHeight;
+      });
+    })();
+  </script>
+
+  <!-- Smooth scroll offset for header -->
+  <script>
+    document.querySelectorAll('nav a[href^="#"]').forEach(link => {
+      link.addEventListener('click', function(e){
+        e.preventDefault();
+        const id = this.getAttribute('href');
+        const target = document.querySelector(id);
+        if(!target) return;
+        const header = document.querySelector('header');
+        const offset = header ? header.offsetHeight + 12 : 12;
+        const top = target.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({top, behavior:'smooth'});
+      });
+    });
+  </script>
+</body>
+</html>
