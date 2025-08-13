@@ -65,8 +65,8 @@
     }
     .logo-title{font-size:28px;color:var(--green);font-weight:700;letter-spacing:1px;text-shadow:0 2px 12px rgba(0,255,153,0.12)}
 
-    nav{display:flex;gap:22px;align-items:center;overflow-x:auto;white-space:nowrap;padding-right:8px}
-    nav a{color:var(--green);font-weight:600;font-size:1rem;display:flex;align-items:center;gap:6px}
+    nav{display:flex;gap:22px;align-items:center;align-items:center;padding-right:8px}
+    nav a{color:var(--green);font-weight:600;font-size:1rem;display:flex;align-items:center;gap:6px;white-space:nowrap;text-overflow:clip}
     nav a:hover{color:#ffffff}
 
     /* Hero */
@@ -188,6 +188,18 @@
         margin-right: 0;
         width: 100%;
         box-sizing: border-box;
+        min-height: auto;
+        gap: 12px;
+      }
+      
+      /* Ensure logo and nav fit properly */
+      .logo-header {
+        flex-shrink: 0;
+        min-width: fit-content;
+      }
+      
+      .logo-title {
+        font-size: 20px !important;
       }
       
       /* Fix navigation mobile */
@@ -198,6 +210,16 @@
         margin-right: 0;
         width: 100%;
         justify-content: center;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+      
+      /* Fix nav links mobile */
+      nav a {
+        white-space: nowrap;
+        font-size: 0.9rem;
+        padding: 8px 12px;
+        min-width: fit-content;
       }
       
       /* Ensure content doesn't overflow */
